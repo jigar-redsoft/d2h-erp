@@ -216,6 +216,19 @@ app_license = "mit"
 # Authentication and authorization
 # --------------------------------
 
-# auth_hooks = [
-#	"d2h.auth.validate"
-# ]
+fixtures = [
+    {
+        "doctype": "Client Script",
+    },
+    {
+        "dt": "Custom Field",
+    }
+]
+
+doc_events = {
+    "Purchase Receipt": {
+        "before_save": "d2h.overrides.purchase_receipt_before_save",
+    },
+}
+
+doctype_js = {"Purchase Receipt" : "public/js/purchase_receipt.js"}
