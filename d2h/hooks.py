@@ -231,4 +231,4 @@ doc_events = {
     },
 }
 
-doctype_js = {"Purchase Receipt" : "public/js/purchase_receipt.js"}
+doctype_js = {"Purchase Receipt" : "public/js/purchase_receipt.js", "Purchase Order" : "public/js/purchase_order.js"}
