@@ -229,6 +229,9 @@ doc_events = {
     "Purchase Receipt": {
         "before_save": "d2h.overrides.purchase_receipt_before_save",
     },
+    "Delivery Note": {
+        "before_save": "d2h.overrides.delivery_note_before_save",
+    }
 }
 
-doctype_js = {"Purchase Receipt" : "public/js/purchase_receipt.js", "Purchase Order" : "public/js/purchase_order.js"}
+doctype_js = {"Purchase Receipt" : "public/js/purchase_receipt.js", "Purchase Order" : "public/js/purchase_order.js", "Delivery Note" : "public/js/delivery_note.js"}
