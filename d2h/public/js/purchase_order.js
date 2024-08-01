@@ -21,7 +21,7 @@ function show_items_dialog(frm) {
         data: frm.doc.items.map((item) => {
           return {
             new_item_code: item.item_code,
-            new_qty: item.qty - item.good_in_transit_qty,
+            new_qty: item.qty - item.custom_good_in_transit_qty,
             new_good_in_transit_qty: 0,
           };
         }),
@@ -63,7 +63,7 @@ function show_items_dialog(frm) {
           } else {
             frm.doc.items.map((i) => {
               if (i.item_code == item.new_item_code) {
-                i.good_in_transit_qty += item.new_good_in_transit_qty;
+                i.custom_good_in_transit_qty += item.new_good_in_transit_qty;
                 frm.dirty();
               }
             });
