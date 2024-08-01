@@ -18,55 +18,61 @@ function show_items_dialog(frm) {
         label: "Items",
         cannot_add_rows: true,
         in_place_edit: true,
-        get_data: () => {
-          data = [];
-          frm.doc.items.forEach((item) => {
-            data.push({
-              new_item_code: item.item_code,
-              new_uom: item.uom,
-              new_qty: item.qty,
-            });
-          });
-          return data;
-        },
+        data: frm.doc.items.map((item) => {
+          return {
+            new_item_code: item.item_code,
+            new_qty: item.qty - item.good_in_transit_qty,
+            new_good_in_transit_qty: 0,
+          };
+        }),
         fields: [
           {
             fieldtype: "Data",
             fieldname: "new_item_code",
             label: "Item Code",
             in_list_view: 1,
-            read_only: 1,
-          },
-          {
-            fieldtype: "Data",
-            fieldname: "new_uom",
-            label: "UOM",
-            in_list_view: 1,
+            columns: 4,
             read_only: 1,
           },
           {
             fieldtype: "Float",
             fieldname: "new_qty",
-            label: "Quantity",
+            label: "Pending Qty",
+            in_list_view: 1,
+            columns: 3,
+            read_only: 1,
+          },
+          {
+            fieldtype: "Float",
+            fieldname: "new_good_in_transit_qty",
+            label: "Good In Transit Qty",
+            columns: 3,
             in_list_view: 1,
           },
         ],
       },
     ],
-    primary_action_label: __("Create"),
+    primary_action_label: __("Save"),
     primary_action: function () {
-      frappe.call({
-        method: "d2h.api.create_stock_entry",
-        args: {
-          items: JSON.stringify(d.get_values().new_items),
-        },
-        callback: function (r) {
-          if (!r.exc) {
-            frappe.msgprint(__("Stock Entry Created"));
-            d.hide();
+      if (d.get_value("new_items").length) {
+        d.get_value("new_items").map((item) => {
+          if (item.new_good_in_transit_qty > item.new_qty) {
+            frappe.throw(
+              __("Good In Transit Qty cannot be greater than Pending Qty")
+            );
+          } else {
+            frm.doc.items.map((i) => {
+              if (i.item_code == item.new_item_code) {
+                i.good_in_transit_qty += item.new_good_in_transit_qty;
+                frm.dirty();
+              }
+            });
+            frm.refresh_field("items");
           }
-        },
-      });
+        });
+      }
+      d.hide();
+      frm.save();
     },
     secondary_action_label: __("Close"),
     secondary_action: function () {
