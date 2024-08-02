@@ -1,9 +1,15 @@
 frappe.ui.form.on("Purchase Order", {
   refresh: function (frm) {
     if (!frm.is_new()) {
-      frm.add_custom_button(__("Good In Transit"), function () {
-        show_items_dialog(frm);
+      qties = frm.doc.items.map((item) => {
+        return item.qty - item.custom_good_in_transit_qty;
       });
+      total_qty = qties.reduce((a, b) => a + b, 0);
+      if (total_qty > 0) {
+        frm.add_custom_button(__("Good In Transit"), function () {
+          show_items_dialog(frm);
+        });
+      }
     }
   },
 });

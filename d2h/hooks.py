@@ -231,7 +231,12 @@ doc_events = {
     },
     "Delivery Note": {
         "before_save": "d2h.overrides.delivery_note_before_save",
+    },
+    "*": {
+        "before_print": "d2h.api.before_print",
     }
 }
+
+app_include_js = "/assets/d2h/js/form.js"
 
 doctype_js = {"Purchase Receipt" : "public/js/purchase_receipt.js", "Purchase Order" : "public/js/purchase_order.js", "Delivery Note" : "public/js/delivery_note.js"}
