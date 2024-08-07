@@ -1,13 +1,20 @@
 frappe.ui.form.on("Purchase Order", {
   refresh: function (frm) {
-    if (!frm.is_new()) {
+    if (!frm.is_new() && frm.doc.status !== "Draft") {
       qties = frm.doc.items.map((item) => {
-        return item.qty - item.custom_good_in_transit_qty;
+        return (
+          item.qty -
+          item.custom_good_in_transit_qty -
+          item.custom_short_close_qty
+        );
       });
       total_qty = qties.reduce((a, b) => a + b, 0);
       if (total_qty > 0) {
         frm.add_custom_button(__("Good In Transit"), function () {
           show_items_dialog(frm);
+        });
+        frm.add_custom_button(__("Short Close"), function () {
+          show_confirm_dialog(frm);
         });
       }
     }
@@ -26,6 +33,7 @@ function show_items_dialog(frm) {
         in_place_edit: true,
         data: frm.doc.items.map((item) => {
           return {
+            name: item.name,
             new_item_code: item.item_code,
             new_qty: item.qty - item.custom_good_in_transit_qty,
             new_good_in_transit_qty: 0,
@@ -67,18 +75,37 @@ function show_items_dialog(frm) {
               __("Good In Transit Qty cannot be greater than Pending Qty")
             );
           } else {
+            items_for_purchase_receipt = [];
+
             frm.doc.items.map((i) => {
-              if (i.item_code == item.new_item_code) {
-                i.custom_good_in_transit_qty += item.new_good_in_transit_qty;
-                frm.dirty();
+              if (i.name == item.name && item.new_good_in_transit_qty) {
+                items_for_purchase_receipt.push({
+                  name: i.name,
+                  item_code: i.item_code,
+                  item_name: i.item_name,
+                  qty: item.new_good_in_transit_qty,
+                  uom: i.uom,
+                });
               }
             });
-            frm.refresh_field("items");
+
+            if (items_for_purchase_receipt.length > 0) {
+              frappe.call({
+                method: "d2h.api.create_purchase_receipt",
+                args: {
+                  purchase_order: frm.doc.name,
+                  items: JSON.stringify(items_for_purchase_receipt),
+                },
+                callback: function () {
+                  frm.dirty();
+                  frappe.msgprint(__("Purchase Receipt has been created."));
+                  frm.refresh_field("items");
+                },
+              });
+            }
           }
         });
       }
-      d.hide();
-      frm.save();
     },
     secondary_action_label: __("Close"),
     secondary_action: function () {
@@ -87,4 +114,22 @@ function show_items_dialog(frm) {
   });
 
   d.show();
+}
+
+function show_confirm_dialog(frm) {
+  frappe.confirm(
+    "Are you sure? This will short close all pending items.",
+    function () {
+      frappe.call({
+        method: "d2h.api.short_close_purchase_order",
+        args: {
+          purchase_order: frm.doc.name,
+        },
+        callback: function (r) {
+          frappe.msgprint(__("Items have been short closed."));
+          frm.refresh();
+        },
+      });
+    }
+  );
 }

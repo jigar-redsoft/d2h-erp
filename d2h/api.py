@@ -1,5 +1,6 @@
 import frappe
 from frappe.utils import today
+import json
 
 LIMIT_PER_DAY = 2
 
@@ -33,3 +34,42 @@ def before_print(_, __, ___):
 
     if print_log['count'] > LIMIT_PER_DAY:
         frappe.throw('The daily print limit for all documents has been reached.')
+
+
+@frappe.whitelist()
+def short_close_purchase_order(purchase_order):
+    purchase_order = frappe.get_doc("Purchase Order", purchase_order)
+    for item in purchase_order.items:
+        item.custom_short_close_qty = item.qty - item.custom_good_in_transit_qty
+
+    purchase_order.status = "Completed"
+    purchase_order.save(ignore_permissions=True)
+
+@frappe.whitelist()
+def create_purchase_receipt(purchase_order, items):
+    purchase_order = frappe.get_doc("Purchase Order", purchase_order)
+    items_list = json.loads(items)
+    
+    purchase_receipt = frappe.get_doc({
+        "doctype": "Purchase Receipt",
+        "supplier": purchase_order.supplier,
+        "items": []
+    })
+
+    for item in items_list:
+        new_item = purchase_receipt.append("items", {})
+        new_item.item_code = item["item_code"]
+        new_item.item_name = item["item_name"]
+        new_item.qty = item["qty"]
+        new_item.uom = item["uom"]
+
+
+    purchase_receipt.insert(ignore_permissions=True)
+
+    for item in purchase_order.items:
+        found_item = next((itm for itm in items_list if itm['name'] == item.name), None)
+        if found_item:
+            item.custom_good_in_transit_qty += found_item['qty']
+
+    purchase_order.save(ignore_permissions=True)
+    return "OK"
