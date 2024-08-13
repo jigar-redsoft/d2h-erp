@@ -62,6 +62,7 @@ def create_purchase_receipt(purchase_order, items):
         new_item.item_name = item["item_name"]
         new_item.qty = item["qty"]
         new_item.uom = item["uom"]
+        new_item.purchase_order = purchase_order.name
 
 
     purchase_receipt.insert(ignore_permissions=True)
@@ -73,3 +74,15 @@ def create_purchase_receipt(purchase_order, items):
 
     purchase_order.save(ignore_permissions=True)
     return "OK"
+
+@frappe.whitelist()
+def get_purchase_order_good_in_transit(purchase_order):
+    purchase_receipts = frappe.get_all(
+        "Purchase Receipt Item",
+        filters={
+            "purchase_order": purchase_order,
+            "docstatus": 1
+        },
+        fields=["name", "item_code", "item_name", "qty"]
+    )
+    return purchase_receipts

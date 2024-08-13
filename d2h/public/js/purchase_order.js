@@ -1,27 +1,44 @@
 frappe.ui.form.on("Purchase Order", {
   refresh: function (frm) {
-    if (!frm.is_new() && frm.doc.status !== "Draft") {
-      qties = frm.doc.items.map((item) => {
-        return (
-          item.qty -
-          item.custom_good_in_transit_qty -
-          item.custom_short_close_qty
-        );
+    if (frm.doc.docstatus == 1) {
+      frappe.call({
+        method: "d2h.api.get_purchase_order_good_in_transit",
+        args: {
+          purchase_order: frm.doc.name,
+        },
+        callback: function (r) {
+          pending_qty = [];
+          frm.doc.items.map((item) => {
+            received_qty = 0;
+            r.message.map((i) => {
+              if (i.item_code == item.item_code) {
+                received_qty += i.qty;
+              }
+            });
+            console.log(received_qty, item.qty);
+            if (received_qty < item.qty) {
+              pending_qty.push({
+                name: item.name,
+                pending: item.qty - received_qty,
+              });
+            }
+          });
+          console.log(frm.doc.items, r.message);
+          if (pending_qty.length > 0) {
+            frm.add_custom_button(__("Good In Transit"), function () {
+              show_items_dialog(frm, pending_qty);
+            });
+            frm.add_custom_button(__("Short Close"), function () {
+              show_confirm_dialog(frm);
+            });
+          }
+        },
       });
-      total_qty = qties.reduce((a, b) => a + b, 0);
-      if (total_qty > 0) {
-        frm.add_custom_button(__("Good In Transit"), function () {
-          show_items_dialog(frm);
-        });
-        frm.add_custom_button(__("Short Close"), function () {
-          show_confirm_dialog(frm);
-        });
-      }
     }
   },
 });
 
-function show_items_dialog(frm) {
+function show_items_dialog(frm, pending_qty) {
   let d = new frappe.ui.Dialog({
     title: "Items",
     fields: [
@@ -35,7 +52,10 @@ function show_items_dialog(frm) {
           return {
             name: item.name,
             new_item_code: item.item_code,
-            new_qty: item.qty - item.custom_good_in_transit_qty,
+            new_qty: pending_qty.find((i) => i.name == item.name)
+              ? pending_qty.find((i) => i.name == item.name).pending -
+                item.custom_good_in_transit_qty
+              : qty,
             new_good_in_transit_qty: 0,
           };
         }),
@@ -100,6 +120,7 @@ function show_items_dialog(frm) {
                   frm.dirty();
                   frappe.msgprint(__("Purchase Receipt has been created."));
                   frm.refresh_field("items");
+                  d.hide();
                 },
               });
             }
@@ -128,6 +149,7 @@ function show_confirm_dialog(frm) {
         callback: function (r) {
           frappe.msgprint(__("Items have been short closed."));
           frm.refresh();
+          d.hide();
         },
       });
     }

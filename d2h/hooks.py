@@ -228,6 +228,7 @@ fixtures = [
 doc_events = {
     "Purchase Receipt": {
         "before_save": "d2h.overrides.purchase_receipt_before_save",
+        "on_submit": "d2h.overrides.on_submit_purchase_receipt"
     },
     "Delivery Note": {
         "before_save": "d2h.overrides.delivery_note_before_save",
