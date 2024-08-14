@@ -40,10 +40,12 @@ def before_print(_, __, ___):
 def short_close_purchase_order(purchase_order):
     purchase_order = frappe.get_doc("Purchase Order", purchase_order)
     for item in purchase_order.items:
-        item.custom_short_close_qty = item.qty - item.custom_good_in_transit_qty
+        if item.qty > item.received_qty:
+            item.custom_short_close_qty = item.qty - item.received_qty
 
-    purchase_order.status = "Completed"
     purchase_order.save(ignore_permissions=True)
+    frappe.msgprint(f"Purchase Order {purchase_order.name} has been short closed.")
+
 
 @frappe.whitelist()
 def create_purchase_receipt(purchase_order, items):
@@ -63,6 +65,8 @@ def create_purchase_receipt(purchase_order, items):
         new_item.qty = item["qty"]
         new_item.uom = item["uom"]
         new_item.purchase_order = purchase_order.name
+        new_item.purchase_order_item = item["name"]
+        new_item.scheduled_date = purchase_order.schedule_date
 
 
     purchase_receipt.insert(ignore_permissions=True)
@@ -83,6 +87,6 @@ def get_purchase_order_good_in_transit(purchase_order):
             "purchase_order": purchase_order,
             "docstatus": 1
         },
-        fields=["name", "item_code", "item_name", "qty"]
+        fields=["name", "item_code", "item_name", "qty", "purchase_order_item"]
     )
     return purchase_receipts

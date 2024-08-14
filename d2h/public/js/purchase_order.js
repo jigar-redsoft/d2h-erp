@@ -11,11 +11,10 @@ frappe.ui.form.on("Purchase Order", {
           frm.doc.items.map((item) => {
             received_qty = 0;
             r.message.map((i) => {
-              if (i.item_code == item.item_code) {
+              if (i.purchase_order_item == item.name) {
                 received_qty += i.qty;
               }
             });
-            console.log(received_qty, item.qty);
             if (received_qty < item.qty) {
               pending_qty.push({
                 name: item.name,
@@ -23,7 +22,6 @@ frappe.ui.form.on("Purchase Order", {
               });
             }
           });
-          console.log(frm.doc.items, r.message);
           if (pending_qty.length > 0) {
             frm.add_custom_button(__("Good In Transit"), function () {
               show_items_dialog(frm, pending_qty);
