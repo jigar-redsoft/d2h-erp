@@ -41,11 +41,12 @@ def short_close_purchase_order(purchase_order):
     purchase_order = frappe.get_doc("Purchase Order", purchase_order)
     for item in purchase_order.items:
         if item.qty > item.received_qty:
-            item.custom_short_close_qty = item.qty - item.received_qty
+            item.custom_short_close_qty = item.qty - item.received_qty - item.custom_good_in_transit_qty
 
+    purchase_order.status = "Closed"
     purchase_order.save(ignore_permissions=True)
-    frappe.msgprint(f"Purchase Order {purchase_order.name} has been short closed.")
 
+    return "OK"
 
 @frappe.whitelist()
 def create_purchase_receipt(purchase_order, items):

@@ -1,6 +1,6 @@
 frappe.ui.form.on("Purchase Order", {
   refresh: function (frm) {
-    if (frm.doc.docstatus == 1) {
+    if (frm.doc.docstatus == 1 && frm.doc.status != "Closed") {
       frappe.call({
         method: "d2h.api.get_purchase_order_good_in_transit",
         args: {
@@ -33,6 +33,24 @@ frappe.ui.form.on("Purchase Order", {
         },
       });
     }
+    setTimeout(() => {
+      $(`[data-label='Status'].inner-group-button`).hide();
+      $(`[data-label='Status%20%3E%20Re-open'].menu-item-label`)
+        .parent()
+        .hide();
+      $(`[data-label='Status%20%3E%20Close'].menu-item-label`).parent().hide();
+      $(`[data-label='Status%20%3E%20Hold'].menu-item-label`).parent().hide();
+    }, 200);
+  },
+  onload: function (frm) {
+    setTimeout(() => {
+      $(`[data-label='Status'].inner-group-button`).hide();
+      $(`[data-label='Status%20%3E%20Re-open'].menu-item-label`)
+        .parent()
+        .hide();
+      $(`[data-label='Status%20%3E%20Close'].menu-item-label`).parent().hide();
+      $(`[data-label='Status%20%3E%20Hold'].menu-item-label`).parent().hide();
+    }, 200);
   },
 });
 
@@ -145,7 +163,9 @@ function show_confirm_dialog(frm) {
           purchase_order: frm.doc.name,
         },
         callback: function (r) {
-          frappe.msgprint(__("Items have been short closed."));
+          frappe.msgprint(
+            __(`Purchase Order ${frm.doc.name} has been short closed.`)
+          );
           frm.refresh();
           d.hide();
         },
