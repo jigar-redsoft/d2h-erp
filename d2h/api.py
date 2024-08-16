@@ -46,9 +46,6 @@ def short_close_purchase_order(purchase_order):
         if item.qty > item.received_qty:
             item.custom_short_close_qty = item.qty - item.received_qty - item.custom_good_in_transit_qty
 
-    purchase_order.status = "Closed"
-    purchase_order.save(ignore_permissions=True)
-
     return "OK"
 
 def set_missing_values(source, target):
@@ -103,56 +100,6 @@ def create_purchase_receipt(purchase_order, items):
     )
     doc.save(ignore_permissions=True)
     
-    # purchase_receipt = frappe.get_doc({
-    #     "doctype": "Purchase Receipt",
-    #     "supplier": purchase_order.supplier,
-    #     "currency": purchase_order.currency,
-    #     "conversion_rate": purchase_order.conversion_rate,
-    #     "buying_price_list": purchase_order.buying_price_list,
-    #     "price_list_currency": purchase_order.price_list_currency,
-    #     "items": []
-    # })
-
-    # for item in items_list:
-    #     new_item = purchase_receipt.append("items", {})
-    #     new_item.item_code = item["item_code"]
-    #     new_item.item_name = item["item_name"]
-    #     new_item.qty = item["qty"]
-    #     new_item.uom = item["uom"]
-    #     new_item.purchase_order = purchase_order.name
-    #     new_item.purchase_order_item = item["name"]
-    #     new_item.scheduled_date = purchase_order.schedule_date
-    #     new_item.supplier_part_no = item.get("supplier_part_no")
-    #     new_item.product_bundle = item.get("product_bundle")
-    #     new_item.item_group = item.get("item_group")
-    #     new_item.brand = item.get("brand")
-    #     new_item.stock_uom = item.get("stock_uom")
-    #     new_item.conversion_factor = item.get("conversion_factor")
-    #     new_item.description = item.get("description")
-    #     new_item.image = item.get("image")
-    #     new_item.price_list_rate = item.get("price_list_rate")
-    #     new_item.base_price_list_rate = item.get("base_price_list_rate")
-    #     new_item.margin_type = item.get("margin_type")
-    #     new_item.margin_rate_or_amount = item.get("margin_rate_or_amount")
-    #     new_item.rate_with_margin = item.get("rate_with_margin")
-    #     new_item.base_rate_with_margin = item.get("base_rate_with_margin")
-    #     new_item.amount = item["qty"] * (item.get("rate") or 0)
-    #     new_item.rate = item.get("rate")
-    #     new_item.stock_qty = item["qty"] * (item.get("conversion_factor") or 0)
-    #     new_item.base_rate = item.get("base_rate")
-    #     new_item.base_amount = item["qty"] * (item.get("base_rate") or 0)
-    #     new_item.discount_percentage = item.get("discount_percentage")
-    #     new_item.discount_amount = item.get("discount_amount")
-    #     new_item.base_discount_amount = item.get("base_discount_amount")
-    #     new_item.net_rate = item.get("net_rate")
-    #     new_item.net_amount = item.get("net_amount")
-    #     new_item.base_net_rate = item.get("base_net_rate")
-    #     new_item.base_net_amount = item.get("base_net_amount")
-    #     new_item.tax_rate = item.get("tax_rate")
-
-
-    # purchase_receipt.insert(ignore_permissions=True)
-
     for item in purchase_order.items:
         found_item = next((itm for itm in items_list if itm['name'] == item.name), None)
         if found_item:
@@ -180,9 +127,6 @@ def short_close_sales_order(sales_order):
     for item in sales_order.items:
         if item.qty > item.delivered_qty:
             item.custom_short_close_qty = item.qty - item.delivered_qty - item.custom_good_in_transit_qty
-
-    sales_order.status = "Closed"
-    sales_order.save(ignore_permissions=True)
 
     return "OK"
 

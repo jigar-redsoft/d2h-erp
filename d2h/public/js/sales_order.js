@@ -166,6 +166,8 @@ function show_confirm_dialog(frm) {
           frappe.msgprint(
             __(`Sales Order ${frm.doc.name} has been short closed.`)
           );
+          cur_frm.cscript.update_status("Close", "Closed");
+
           frm.refresh();
           d.hide();
         },

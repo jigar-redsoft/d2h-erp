@@ -40,7 +40,7 @@ frappe.ui.form.on("Purchase Order", {
         .hide();
       $(`[data-label='Status%20%3E%20Close'].menu-item-label`).parent().hide();
       $(`[data-label='Status%20%3E%20Hold'].menu-item-label`).parent().hide();
-    }, 200);
+    }, 400);
   },
   onload: function (frm) {
     setTimeout(() => {
@@ -50,7 +50,7 @@ frappe.ui.form.on("Purchase Order", {
         .hide();
       $(`[data-label='Status%20%3E%20Close'].menu-item-label`).parent().hide();
       $(`[data-label='Status%20%3E%20Hold'].menu-item-label`).parent().hide();
-    }, 200);
+    }, 400);
   },
 });
 
@@ -166,6 +166,7 @@ function show_confirm_dialog(frm) {
           frappe.msgprint(
             __(`Purchase Order ${frm.doc.name} has been short closed.`)
           );
+          cur_frm.cscript.update_status("Close", "Closed");
           frm.refresh();
           d.hide();
         },
