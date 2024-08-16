@@ -60,97 +60,98 @@ def set_missing_values(source, target):
 def create_purchase_receipt(purchase_order, items):
     purchase_order = frappe.get_doc("Purchase Order", purchase_order)
     items_list = json.loads(items)
-    def update_item(obj, target, source_parent):
-        target.qty = flt(obj.qty) - flt(obj.received_qty)
-        target.stock_qty = (flt(obj.qty) - flt(obj.received_qty)) * flt(obj.conversion_factor)
-        target.amount = (flt(obj.qty) - flt(obj.received_qty)) * flt(obj.rate)
-        target.base_amount = (
-            (flt(obj.qty) - flt(obj.received_qty)) * flt(obj.rate) * flt(source_parent.conversion_rate)
-        )
+    # def update_item(obj, target, source_parent):
+    #     target.qty = flt(obj.qty) - flt(obj.received_qty)
+    #     target.stock_qty = (flt(obj.qty) - flt(obj.received_qty)) * flt(obj.conversion_factor)
+    #     target.amount = (flt(obj.qty) - flt(obj.received_qty)) * flt(obj.rate)
+    #     target.base_amount = (
+    #         (flt(obj.qty) - flt(obj.received_qty)) * flt(obj.rate) * flt(source_parent.conversion_rate)
+    #     )
 
-    doc = get_mapped_doc(
-        "Purchase Order",
-        purchase_order.name,
-        {
-            "Purchase Order": {
-                "doctype": "Purchase Receipt",
-                "field_map": {"supplier_warehouse": "supplier_warehouse"},
-                "validation": {
-                    "docstatus": ["=", 1],
-                },
-            },
-            "Purchase Order Item": {
-                "doctype": "Purchase Receipt Item",
-                "field_map": {
-                    "name": "purchase_order_item",
-                    "parent": "purchase_order",
-                    "bom": "bom",
-                    "material_request": "material_request",
-                    "material_request_item": "material_request_item",
-                    "sales_order": "sales_order",
-                    "sales_order_item": "sales_order_item",
-                    "wip_composite_asset": "wip_composite_asset",
-                },
-                "postprocess": update_item,
-                "condition": lambda doc: abs(doc.received_qty) < abs(doc.qty)
-                and doc.delivered_by_supplier != 1,
-            },
-            "Purchase Taxes and Charges": {"doctype": "Purchase Taxes and Charges", "add_if_empty": True},
-        },
-        None,
-        set_missing_values,
-    )
-    doc.save(ignore_permissions=True)
+    # doc = get_mapped_doc(
+    #     "Purchase Order",
+    #     purchase_order.name,
+    #     {
+    #         "Purchase Order": {
+    #             "doctype": "Purchase Receipt",
+    #             "field_map": {"supplier_warehouse": "supplier_warehouse"},
+    #             "validation": {
+    #                 "docstatus": ["=", 1],
+    #             },
+    #         },
+    #         "Purchase Order Item": {
+    #             "doctype": "Purchase Receipt Item",
+    #             "field_map": {
+    #                 "name": "purchase_order_item",
+    #                 "parent": "purchase_order",
+    #                 "bom": "bom",
+    #                 "material_request": "material_request",
+    #                 "material_request_item": "material_request_item",
+    #                 "sales_order": "sales_order",
+    #                 "sales_order_item": "sales_order_item",
+    #                 "wip_composite_asset": "wip_composite_asset",
+    #             },
+    #             "postprocess": update_item,
+    #             "condition": lambda doc: abs(doc.received_qty) < abs(doc.qty)
+    #             and doc.delivered_by_supplier != 1,
+    #         },
+    #         "Purchase Taxes and Charges": {"doctype": "Purchase Taxes and Charges", "add_if_empty": True},
+    #     },
+    #     None,
+    #     set_missing_values,
+    # )
+    # doc.save(ignore_permissions=True)
 
     
-    # purchase_receipt = frappe.get_doc({
-    #     "doctype": "Purchase Receipt",
-    #     "supplier": purchase_order.supplier,
-    #     "currency": purchase_order.currency,
-    #     "conversion_rate": purchase_order.conversion_rate,
-    #     "buying_price_list": purchase_order.buying_price_list,
-    #     "price_list_currency": purchase_order.price_list_currency,
-    #     "items": []
-    # })
+    purchase_receipt = frappe.get_doc({
+        "doctype": "Purchase Receipt",
+        "supplier": purchase_order.supplier,
+        "currency": purchase_order.currency,
+        "conversion_rate": purchase_order.conversion_rate,
+        "buying_price_list": purchase_order.buying_price_list,
+        "price_list_currency": purchase_order.price_list_currency,
+        "items": []
+    })
 
-    # for item in items_list:
-    #     new_item = purchase_receipt.append("items", {})
-    #     new_item.item_code = item["item_code"]
-    #     new_item.item_name = item["item_name"]
-    #     new_item.qty = item["qty"]
-    #     new_item.uom = item["uom"]
-    #     new_item.purchase_order = purchase_order.name
-    #     new_item.purchase_order_item = item["name"]
-    #     new_item.scheduled_date = purchase_order.schedule_date
-    #     new_item.supplier_part_no = item.get("supplier_part_no")
-    #     new_item.product_bundle = item.get("product_bundle")
-    #     new_item.item_group = item.get("item_group")
-    #     new_item.brand = item.get("brand")
-    #     new_item.stock_uom = item.get("stock_uom")
-    #     new_item.conversion_factor = item.get("conversion_factor")
-    #     new_item.description = item.get("description")
-    #     new_item.image = item.get("image")
-    #     new_item.price_list_rate = item.get("price_list_rate")
-    #     new_item.base_price_list_rate = item.get("base_price_list_rate")
-    #     new_item.margin_type = item.get("margin_type")
-    #     new_item.margin_rate_or_amount = item.get("margin_rate_or_amount")
-    #     new_item.rate_with_margin = item.get("rate_with_margin")
-    #     new_item.base_rate_with_margin = item.get("base_rate_with_margin")
-    #     new_item.amount = item.get("amount")
-    #     new_item.rate = item.get("rate")
-    #     new_item.base_rate = item.get("base_rate")
-    #     new_item.base_amount = item.get("base_amount")
-    #     new_item.discount_percentage = item.get("discount_percentage")
-    #     new_item.discount_amount = item.get("discount_amount")
-    #     new_item.base_discount_amount = item.get("base_discount_amount")
-    #     new_item.net_rate = item.get("net_rate")
-    #     new_item.net_amount = item.get("net_amount")
-    #     new_item.base_net_rate = item.get("base_net_rate")
-    #     new_item.base_net_amount = item.get("base_net_amount")
-    #     new_item.tax_rate = item.get("tax_rate")
+    for item in items_list:
+        new_item = purchase_receipt.append("items", {})
+        new_item.item_code = item["item_code"]
+        new_item.item_name = item["item_name"]
+        new_item.qty = item["qty"]
+        new_item.uom = item["uom"]
+        new_item.purchase_order = purchase_order.name
+        new_item.purchase_order_item = item["name"]
+        new_item.scheduled_date = purchase_order.schedule_date
+        new_item.supplier_part_no = item.get("supplier_part_no")
+        new_item.product_bundle = item.get("product_bundle")
+        new_item.item_group = item.get("item_group")
+        new_item.brand = item.get("brand")
+        new_item.stock_uom = item.get("stock_uom")
+        new_item.conversion_factor = item.get("conversion_factor")
+        new_item.description = item.get("description")
+        new_item.image = item.get("image")
+        new_item.price_list_rate = item.get("price_list_rate")
+        new_item.base_price_list_rate = item.get("base_price_list_rate")
+        new_item.margin_type = item.get("margin_type")
+        new_item.margin_rate_or_amount = item.get("margin_rate_or_amount")
+        new_item.rate_with_margin = item.get("rate_with_margin")
+        new_item.base_rate_with_margin = item.get("base_rate_with_margin")
+        new_item.amount = item["qty"] * item.get("rate")
+        new_item.rate = item.get("rate")
+        new_item.stock_qty = item["qty"] * item.get("conversion_factor")
+        new_item.base_rate = item.get("base_rate")
+        new_item.base_amount = item["qty"] * item.get("base_rate")
+        new_item.discount_percentage = item.get("discount_percentage")
+        new_item.discount_amount = item.get("discount_amount")
+        new_item.base_discount_amount = item.get("base_discount_amount")
+        new_item.net_rate = item.get("net_rate")
+        new_item.net_amount = item.get("net_amount")
+        new_item.base_net_rate = item.get("base_net_rate")
+        new_item.base_net_amount = item.get("base_net_amount")
+        new_item.tax_rate = item.get("tax_rate")
 
 
-    # purchase_receipt.insert(ignore_permissions=True)
+    purchase_receipt.insert(ignore_permissions=True)
 
     for item in purchase_order.items:
         found_item = next((itm for itm in items_list if itm['name'] == item.name), None)
