@@ -180,6 +180,7 @@ def create_delivery_note(sales_order, items):
         new_item.base_net_rate = item.get("base_net_rate")
         new_item.base_net_amount = item.get("base_net_amount")
         new_item.tax_rate = item.get("tax_rate")
+        new_item.serial_and_batch_bundle = item.get("serial_and_batch_bundle")
 
 
     delivery_note.insert(ignore_permissions=True)
