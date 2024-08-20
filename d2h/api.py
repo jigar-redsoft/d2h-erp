@@ -46,6 +46,7 @@ def short_close_purchase_order(purchase_order):
         if item.qty > item.received_qty:
             item.custom_short_close_qty = item.qty - item.received_qty - item.custom_good_in_transit_qty
 
+    purchase_order.save(ignore_permissions=True)
     return "OK"
 
 def set_missing_values(source, target):
@@ -128,6 +129,7 @@ def short_close_sales_order(sales_order):
         if item.qty > item.delivered_qty:
             item.custom_short_close_qty = item.qty - item.delivered_qty
 
+    sales_order.save(ignore_permissions=True)
     return "OK"
 
 @frappe.whitelist()

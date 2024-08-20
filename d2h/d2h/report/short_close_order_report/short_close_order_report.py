@@ -161,13 +161,6 @@ def get_columns():
 			"convertible": "qty",
 		},
 		{
-			"label": _("Pending Qty"),
-			"fieldname": "pending_qty",
-			"fieldtype": "Float",
-			"width": 100,
-			"convertible": "qty",
-		},
-		{
 			"label": _("Good In Transit Qty"),
 			"fieldname": "custom_good_in_transit_qty",
 			"fieldtype": "Float",
@@ -179,20 +172,6 @@ def get_columns():
 			"fieldname": "custom_short_close_qty",
 			"fieldtype": "Float",
 			"width": 140,
-			"convertible": "qty",
-		},
-		{
-			"label": _("Billed Qty"),
-			"fieldname": "billed_qty",
-			"fieldtype": "Float",
-			"width": 100,
-			"convertible": "qty",
-		},
-		{
-			"label": _("Qty to Bill"),
-			"fieldname": "qty_to_bill",
-			"fieldtype": "Float",
-			"width": 100,
 			"convertible": "qty",
 		},
 		{
@@ -214,14 +193,6 @@ def get_columns():
 		{
 			"label": _("Pending Amount"),
 			"fieldname": "pending_amount",
-			"fieldtype": "Currency",
-			"width": 130,
-			"options": "Company:company:default_currency",
-			"convertible": "rate",
-		},
-		{
-			"label": _("Received Qty Amount"),
-			"fieldname": "received_qty_amount",
 			"fieldtype": "Currency",
 			"width": 130,
 			"options": "Company:company:default_currency",
