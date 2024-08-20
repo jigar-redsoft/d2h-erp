@@ -30,14 +30,3 @@ def on_submit_purchase_receipt(doc, method):
             item_order.custom_good_in_transit_qty = 0
         item_order.save()
 
-def on_submit_delivery_note(doc, method):
-    for item in doc.items:
-        item_order = frappe.get_doc("Sales Order Item", {
-            "item_code": item.item_code,
-            "parent": item.against_sales_order
-        })
-        if(item_order.custom_good_in_transit_qty > item.qty):
-            item_order.custom_good_in_transit_qty -= item.qty
-        else:
-            item_order.custom_good_in_transit_qty = 0
-        item_order.save()
