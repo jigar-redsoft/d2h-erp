@@ -104,15 +104,20 @@ function show_items_dialog(frm, pending_qty) {
     ],
     primary_action_label: __("Save"),
     primary_action: function () {
+      let error = false;
       if (d.get_value("new_items").length) {
         d.get_value("new_items").map((item) => {
           if (item.new_good_in_transit_qty > item.new_qty) {
-            frappe.throw(
-              __("Good In Transit Qty cannot be greater than Pending Qty")
-            );
-          } else {
-            items_for_purchase_receipt = [];
-
+            error = true;
+          }
+        });
+        if (error) {
+          frappe.throw(
+            __("Good In Transit Qty cannot be greater than Pending Qty")
+          );
+        } else {
+          items_for_purchase_receipt = [];
+          d.get_value("new_items").map((item) => {
             frm.doc.items.map((i) => {
               if (i.name == item.name && item.new_good_in_transit_qty) {
                 items_for_purchase_receipt.push({
@@ -124,24 +129,24 @@ function show_items_dialog(frm, pending_qty) {
                 });
               }
             });
+          });
 
-            if (items_for_purchase_receipt.length > 0) {
-              frappe.call({
-                method: "d2h.api.create_purchase_receipt",
-                args: {
-                  purchase_order: frm.doc.name,
-                  items: JSON.stringify(items_for_purchase_receipt),
-                },
-                callback: function () {
-                  frm.dirty();
-                  frappe.msgprint(__("Purchase Receipt has been created."));
-                  frm.refresh_field("items");
-                  d.hide();
-                },
-              });
-            }
+          if (items_for_purchase_receipt.length > 0) {
+            frappe.call({
+              method: "d2h.api.create_purchase_receipt",
+              args: {
+                purchase_order: frm.doc.name,
+                items: JSON.stringify(items_for_purchase_receipt),
+              },
+              callback: function () {
+                frm.dirty();
+                frappe.msgprint(__("Purchase Receipt has been created."));
+                frm.refresh_field("items");
+                d.hide();
+              },
+            });
           }
-        });
+        }
       }
     },
     secondary_action_label: __("Close"),
