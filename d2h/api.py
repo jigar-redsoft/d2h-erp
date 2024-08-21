@@ -38,6 +38,21 @@ def before_print(_, __, ___):
     if print_log['count'] > LIMIT_PER_DAY:
         frappe.throw('The daily print limit for all documents has been reached.')
 
+@frappe.whitelist()
+def get_print_limit():
+    current_date = today()
+
+    print_log = frappe.cache().hget('global_daily_print_log', 'count')
+
+    if not print_log:
+        return { "limit_reached" : False }
+
+    if print_log.get('date') != current_date:
+        return { "limit_reached" : False }
+
+    if print_log['count'] > LIMIT_PER_DAY:
+        return { "limit_reached" : True }
+
 
 @frappe.whitelist()
 def short_close_purchase_order(purchase_order):
