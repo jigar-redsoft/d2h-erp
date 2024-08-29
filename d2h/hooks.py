@@ -231,8 +231,7 @@ doc_events = {
         "on_submit": "d2h.overrides.on_submit_purchase_receipt"
     },
     "Delivery Note": {
-        "before_save": "d2h.overrides.delivery_note_before_save",
-        "on_submit": "d2h.overrides.on_submit_delivery_note"
+        "before_save": "d2h.overrides.delivery_note_before_save"
     },
     "*": {
         "before_print": "d2h.api.before_print",
