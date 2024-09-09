@@ -32,3 +32,17 @@ def on_submit_purchase_receipt(doc, method):
 
 def on_delete_purchase_receipt(doc, method):
     on_submit_purchase_receipt(doc, method)
+
+def sales_order_before_load(user):
+    if "Store Dept" in frappe.get_roles(user) and frappe.session.user != "Administrator":
+        return """
+            `tabSales Order`.name IN (
+                SELECT DISTINCT sii.sales_order
+                FROM `tabSales Invoice Item` sii
+                JOIN `tabSales Invoice` si ON si.name = sii.parent
+                WHERE si.status = 'Paid'
+            )
+            OR `tabSales Order`.custom_balance_status = 'Approved'
+        """
+    else:
+        ""

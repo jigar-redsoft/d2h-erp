@@ -1,3 +1,4 @@
+from erpnext.accounts.party import get_dashboard_info
 import frappe
 from frappe.model.mapper import get_mapped_doc
 from frappe.utils import today
@@ -158,3 +159,8 @@ def get_sales_order_good_in_transit(sales_order):
         fields=["name", "item_code", "item_name", "qty", "so_detail"]
     )
     return delivery_notes
+
+@frappe.whitelist()
+def customer_has_balance(customer):
+    info = get_dashboard_info("Customer", customer)
+    return { "balance": info[0]["total_unpaid"] }

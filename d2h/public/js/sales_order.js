@@ -29,6 +29,57 @@ frappe.ui.form.on("Sales Order", {
           }
         },
       });
+      frappe.call({
+        method: "d2h.api.customer_has_balance",
+        args: {
+          customer: frm.doc.customer,
+        },
+        callback: function (r) {
+          if (r.message && r.message.balance < 0) {
+            if (frappe.user_roles.includes("Finance Dept")) {
+              frm.add_custom_button(__("Allow Delivery"), function () {
+                if (frm.doc.custom_balance_status == "Applied") {
+                  frappe.msgprint(
+                    __("Delivery Request is already has been sent.")
+                  );
+                } else if (frm.doc.custom_balance_status == "Approved") {
+                  frappe.msgprint(
+                    __("Delivery Request is already has been approved.")
+                  );
+                } else {
+                  show_allow_delivery_confirm_dialog(frm, r.message.balance);
+                }
+              });
+              if (
+                frm.doc.custom_balance_status == "Applied" ||
+                frm.doc.custom_balance_status == "Approved"
+              ) {
+                $(`button[data-label='Allow%20Delivery']`).css({
+                  "background-color": "#b9ecca",
+                  color: "#16794c",
+                });
+              }
+            }
+            if (frappe.user_roles.includes("Finance Manager")) {
+              frm.add_custom_button(__("Approve Delivery"), function () {
+                if (frm.doc.custom_balance_status == "Approved") {
+                  frappe.msgprint(
+                    __("Delivery Request is already has been approved.")
+                  );
+                } else {
+                  show_approve_delivery_confirm_dialog(frm, r.message.balance);
+                }
+              });
+              if (frm.doc.custom_balance_status == "Approved") {
+                $(`button[data-label='Approve%20Delivery']`).css({
+                  "background-color": "#b9ecca",
+                  color: "#16794c",
+                });
+              }
+            }
+          }
+        },
+      });
     }
     setTimeout(() => {
       $(`[data-label='Status'].inner-group-button`).hide();
@@ -70,6 +121,32 @@ function show_confirm_dialog(frm) {
           d.hide();
         },
       });
+    }
+  );
+}
+
+function show_allow_delivery_confirm_dialog(frm, balance) {
+  frappe.confirm(
+    "Are you sure? This will send a request to allow delivery. Customer balance: " +
+      Math.abs(balance),
+    function () {
+      frm.doc.custom_balance_status = "Applied";
+      frm.refresh();
+      frm.dirty();
+      frm.save_or_update();
+    }
+  );
+}
+
+function show_approve_delivery_confirm_dialog(frm, balance) {
+  frappe.confirm(
+    "Are you sure? This will allow delivery. Customer balance: " +
+      Math.abs(balance),
+    function () {
+      frm.doc.custom_balance_status = "Approved";
+      frm.refresh();
+      frm.dirty();
+      frm.save_or_update();
     }
   );
 }

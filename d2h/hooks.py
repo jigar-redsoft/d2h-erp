@@ -239,6 +239,10 @@ doc_events = {
     }
 }
 
+permission_query_conditions = {
+	"Sales Order": "d2h.overrides.sales_order_before_load",
+}
+
 app_include_js = "/assets/d2h/js/form.js"
 
 doctype_js = {"Purchase Receipt" : "public/js/purchase_receipt.js", "Purchase Order" : "public/js/purchase_order.js", "Delivery Note" : "public/js/delivery_note.js", "Sales Order" : "public/js/sales_order.js"}
