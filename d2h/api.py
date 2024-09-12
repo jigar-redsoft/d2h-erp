@@ -161,6 +161,15 @@ def get_sales_order_good_in_transit(sales_order):
     return delivery_notes
 
 @frappe.whitelist()
-def customer_has_balance(customer):
+def customer_has_balance(customer, sales_order):
     info = get_dashboard_info("Customer", customer)
-    return { "balance": info[0]["total_unpaid"] }
+    order = frappe.get_doc("Sales Order", sales_order)
+    invoice_exists = frappe.db.exists("Sales Invoice Item", {"sales_order": sales_order, "docstatus": 1})
+    pending_amount = order.total
+    total = order.total
+    if invoice_exists:
+        invoice_item = frappe.get_doc("Sales Invoice Item", {"sales_order": sales_order, "docstatus": 1})
+        invoice = frappe.get_doc("Sales Invoice", { "name": invoice_item.parent })
+        pending_amount = invoice.outstanding_amount
+        total = invoice.total
+    return { "balance": info[0]["total_unpaid"], "pending": pending_amount, "total": total }

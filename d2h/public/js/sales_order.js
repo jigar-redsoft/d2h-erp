@@ -33,6 +33,7 @@ frappe.ui.form.on("Sales Order", {
         method: "d2h.api.customer_has_balance",
         args: {
           customer: frm.doc.customer,
+          sales_order: frm.doc.name,
         },
         callback: function (r) {
           if (r.message && r.message.balance < 0) {
@@ -47,7 +48,7 @@ frappe.ui.form.on("Sales Order", {
                     __("Delivery Request is already has been approved.")
                   );
                 } else {
-                  show_allow_delivery_confirm_dialog(frm, r.message.balance);
+                  show_allow_delivery_confirm_dialog(frm, r.message);
                 }
               });
               if (
@@ -67,7 +68,7 @@ frappe.ui.form.on("Sales Order", {
                     __("Delivery Request is already has been approved.")
                   );
                 } else {
-                  show_approve_delivery_confirm_dialog(frm, r.message.balance);
+                  show_approve_delivery_confirm_dialog(frm, r.message);
                 }
               });
               if (frm.doc.custom_balance_status == "Approved") {
@@ -125,10 +126,15 @@ function show_confirm_dialog(frm) {
   );
 }
 
-function show_allow_delivery_confirm_dialog(frm, balance) {
+function show_allow_delivery_confirm_dialog(frm, data) {
   frappe.confirm(
-    "Are you sure? This will send a request to allow delivery. Customer balance: " +
-      Math.abs(balance),
+    `Are you sure? This will send a request to allow the delivery. <br/>Customer Balance: ${Math.abs(
+      data.balance
+    )} <br/>Sales Order Amount: ${Math.abs(
+      data.total
+    )} <br/>Sales Order Paid: ${Math.abs(
+      data.total - data.pending
+    )} <br/>Amount Pending: ${Math.abs(data.pending)}`,
     function () {
       frm.doc.custom_balance_status = "Applied";
       frm.refresh();
@@ -138,10 +144,15 @@ function show_allow_delivery_confirm_dialog(frm, balance) {
   );
 }
 
-function show_approve_delivery_confirm_dialog(frm, balance) {
+function show_approve_delivery_confirm_dialog(frm, data) {
   frappe.confirm(
-    "Are you sure? This will allow delivery. Customer balance: " +
-      Math.abs(balance),
+    `Are you sure? This will allow delivery. <br/>Customer Balance: ${Math.abs(
+      data.balance
+    )} <br/>Sales Order Amount: ${Math.abs(
+      data.total
+    )} <br/>Sales Order Paid: ${Math.abs(
+      data.total - data.pending
+    )} <br/>Amount Pending: ${Math.abs(data.pending)}`,
     function () {
       frm.doc.custom_balance_status = "Approved";
       frm.refresh();
