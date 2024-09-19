@@ -227,12 +227,8 @@ fixtures = [
 
 doc_events = {
     "Purchase Receipt": {
-        "before_save": "d2h.overrides.purchase_receipt_before_save",
         "on_submit": "d2h.overrides.on_submit_purchase_receipt",
         "on_trash": "d2h.overrides.on_delete_purchase_receipt"
-    },
-    "Delivery Note": {
-        "before_save": "d2h.overrides.delivery_note_before_save"
     },
     "*": {
         "before_print": "d2h.api.before_print"
@@ -246,3 +242,5 @@ permission_query_conditions = {
 app_include_js = "/assets/d2h/js/form.js"
 
 doctype_js = {"Purchase Receipt" : "public/js/purchase_receipt.js", "Purchase Order" : "public/js/purchase_order.js", "Delivery Note" : "public/js/delivery_note.js", "Sales Order" : "public/js/sales_order.js"}
+
+doctype_list_js = {"Delivery Note" : "public/js/delivery_note_list.js", "Purchase Receipt" : "public/js/purchase_receipt_list.js", "Sales Order" : "public/js/sales_order_list.js"}
