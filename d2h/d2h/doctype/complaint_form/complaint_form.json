@@ -8,6 +8,7 @@
   "customer",
   "serial_no",
   "warranty_expiry_date",
+  "warranty_status",
   "column_break_xtqt",
   "date",
   "status"
@@ -26,6 +27,7 @@
    "fieldtype": "Column Break"
   },
   {
+   "default": "Today",
    "fieldname": "date",
    "fieldtype": "Date",
    "label": "Date"
@@ -49,12 +51,21 @@
    "fetch_if_empty": 1,
    "fieldname": "warranty_expiry_date",
    "fieldtype": "Date",
-   "label": "Warranty Expiry Date"
+   "label": "Warranty Expiry Date",
+   "read_only": 1
+  },
+  {
+   "default": "False",
+   "fieldname": "warranty_status",
+   "fieldtype": "Select",
+   "label": "Warranty Expired ?",
+   "options": "True\nFalse",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-20 07:53:00.968176",
+ "modified": "2024-09-20 08:27:52.016806",
  "modified_by": "Administrator",
  "module": "D2H",
  "name": "Complaint Form",
