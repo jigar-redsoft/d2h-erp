@@ -8,8 +8,8 @@
  "field_order": [
   "title",
   "activities",
-  "get_equipments",
-  "activity_equipments"
+  "get_items",
+  "activity_items"
  ],
  "fields": [
   {
@@ -26,21 +26,21 @@
    "options": "Job Cards Activity"
   },
   {
-   "fieldname": "get_equipments",
+   "fieldname": "get_items",
    "fieldtype": "Button",
-   "label": "Get Equipments"
+   "label": "Get Items"
   },
   {
-   "fieldname": "activity_equipments",
+   "fieldname": "activity_items",
    "fieldtype": "Table",
-   "label": "Activity Equipments",
-   "options": "Activity Equipment",
+   "label": "Activity Items",
+   "options": "Activity Item",
    "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-25 08:14:29.436277",
+ "modified": "2024-09-26 04:17:18.022630",
  "modified_by": "Administrator",
  "module": "D2H",
  "name": "Job Cards",

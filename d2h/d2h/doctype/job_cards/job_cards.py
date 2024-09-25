@@ -9,14 +9,14 @@ class JobCards(Document):
 	pass
 
 @frappe.whitelist()
-def get_equipments(activities):
+def get_items(activities):
 	activities = json.loads(activities)
 	data = []
 	for activity in activities:
-		equipments = frappe.get_all("Activity Equipment", filters={"parent": activity}, fields=["equipment", "quantity"])
-		for equipment in equipments:
+		items = frappe.get_all("Activity Item", filters={"parent": activity}, fields=["item", "quantity"])
+		for item in items:
 			data.append({
-				"equipment": equipment.equipment,
-				"quantity": equipment.quantity
+				"item": item.item,
+				"quantity": item.quantity
 			})
 	return data

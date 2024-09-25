@@ -7,7 +7,7 @@
  "engine": "InnoDB",
  "field_order": [
   "activity_name",
-  "equipments"
+  "items"
  ],
  "fields": [
   {
@@ -18,15 +18,15 @@
    "reqd": 1
   },
   {
-   "fieldname": "equipments",
+   "fieldname": "items",
    "fieldtype": "Table",
-   "label": "Equipments",
-   "options": "Activity Equipment"
+   "label": "Items",
+   "options": "Activity Item"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-24 07:09:15.974200",
+ "modified": "2024-09-26 04:16:19.512682",
  "modified_by": "Administrator",
  "module": "D2H",
  "name": "Activity",
