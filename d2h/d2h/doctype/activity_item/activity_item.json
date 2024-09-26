@@ -7,7 +7,8 @@
  "engine": "InnoDB",
  "field_order": [
   "item",
-  "quantity"
+  "quantity",
+  "status"
  ],
  "fields": [
   {
@@ -25,12 +26,21 @@
    "label": "Item",
    "options": "Item",
    "reqd": 1
+  },
+  {
+   "default": "Open",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "hidden": 1,
+   "label": "Status",
+   "options": "Open\nIn Process\nClosed",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2024-09-26 04:14:19.156790",
+ "modified": "2024-09-26 08:28:23.948944",
  "modified_by": "Administrator",
  "module": "D2H",
  "name": "Activity Item",

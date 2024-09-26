@@ -7,6 +7,7 @@
  "engine": "InnoDB",
  "field_order": [
   "title",
+  "status",
   "activities",
   "get_items",
   "activity_items"
@@ -36,11 +37,19 @@
    "label": "Activity Items",
    "options": "Activity Item",
    "read_only": 1
+  },
+  {
+   "default": "Open",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Open\nIn Process\nClosed",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-09-26 04:17:18.022630",
+ "modified": "2024-09-26 08:28:09.534887",
  "modified_by": "Administrator",
  "module": "D2H",
  "name": "Job Cards",
